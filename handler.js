@@ -1,40 +1,12 @@
 const { spawn } = require("child_process")
 const EventEmitter = require("events")
+const Screen = require("./screen")
 
-require("dotenv").config()
-
-const USERNAME = process.env.USER
-const PASSWORD = process.env.PASSWORD
-
-class Screen extends EventEmitter {
-  constructor() {
-    super()
-    this.screenArr = []
-    this.screenMatrix = []
-    this.screenString = ''
-
-    this.setScreen = this._setScreen.bind(this)
-  }
-
-  _setScreen(arr) {
-    this.screenMatrix = []
-    this.screenArr = []
-    for (let each of arr) {
-      const subEach = each.substring(5);
-
-      this.screenMatrix.push(subEach.split(""))
-      this.screenArr.push(subEach)
-    }
-    this.screenString = this.screenArr.join("\n")
-    this.emit("update", this)
-
-  }
-
-}
 
 class Handler extends EventEmitter {
-  constructor() {
+  constructor(url) {
     super()
+
     this.counter = 0
     // spawen emulator child process
     this.emulator = spawn("./x3270/ws3270", ["-xrm", "s3270.unlockDelay: False"])
@@ -59,6 +31,10 @@ class Handler extends EventEmitter {
     setInterval(() => {
       this.execFromBuffer()
     }, 5);
+
+    if (url) {
+      this.queueConnect(url)
+    }
   }
 
   exec(command) {
@@ -153,7 +129,7 @@ class Handler extends EventEmitter {
           screenBuffer.push(line)
 
         }
-        this.screen._setScreen(screenBuffer.slice(0, 24))
+        this.screen.setScreen(screenBuffer.slice(0, 24))
         this.status = screenBuffer.slice(24)
         clearInterval(read)
         this.locked = false
