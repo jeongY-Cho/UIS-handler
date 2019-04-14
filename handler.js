@@ -6,22 +6,30 @@ require("dotenv").config()
 const USERNAME = process.env.USER
 const PASSWORD = process.env.PASSWORD
 
-class Screen {
+class Screen extends EventEmitter {
   constructor() {
+    super()
     this.screenArr = []
     this.screenMatrix = []
+    this.screenString = ''
 
-    this.setScreen = this.setScreen.bind(this)
+    this.setScreen = this._setScreen.bind(this)
   }
 
-  setScreen(screenArr) {
+  _setScreen(arr) {
     this.screenMatrix = []
-    for (let each of screenArr) {
-      this.screenMatrix.push(each.substring(6).split())
+    this.screenArr = []
+    for (let each of arr) {
+      const subEach = each.substring(5);
+
+      this.screenMatrix.push(subEach.split(""))
+      this.screenArr.push(subEach)
     }
-    console.log(this.screenMatrix);
+    this.screenString = this.screenArr.join("\n")
+    this.emit("update", this)
 
   }
+
 }
 
 class Handler extends EventEmitter {
@@ -35,52 +43,144 @@ class Handler extends EventEmitter {
     // set alises for emulator stdin stdout
     this.input = this.emulator.stdin
     this.output = this.emulator.stdout
+
     // set for stdout so its easier
     this.output.setEncoding("utf-8")
-    this.output.on("readable", () => {
-      console.log(`readable bytes ${this.output.readableLength}`)
-      console.log(this.counter++);
-      this._readStream()
+
+
+    this.on("lock", () => {
+      this.locked = true
     })
 
-    this.output.on("end", () => console.log("end"))
-
     this.screen = new Screen()
+
+    this.buffer = []
+
+    setInterval(() => {
+      this.execFromBuffer()
+    }, 5);
   }
 
   exec(command) {
-    this.input.write(command + "\n")
+    this.buffer.unshift(command)
   }
 
-  _readStream() {
-    let string = ''
+  _exec(command) {
+    this.locked = true
+    this.emit("lock")
+    this.input.write(command + "\n")
+    if (command === "ascii") {
+      this._getScreen()
+    } else {
+      this._getStatus()
+      this.buffer.unshift("ascii")
+    }
+  }
 
-    while (this.output.readableLength > 0) {
-      let char = this.output.read(1)
+  queue(command) {
+    this.buffer.push(command)
+  }
+  queueEnter() {
+    this.buffer.push("enter")
+  }
+  queueString(command) {
+    this.buffer.push("String " + command)
+  }
+  queueTab() {
+    this.buffer.push("tab")
+  }
+  queueConnect(url) {
+    this.buffer.push("connect  " + url)
+  }
 
-      if (char !== "\n" && char !== "\r") {
-        string += char
+  queueMacro(commandArray) {
+    // this.locked = true
+    commandArray.slice().forEach((each) => {
+      each = String(each)
+
+      if (each.substring(0, 3) === ":::") {
+
+        this.buffer.push(each.substring(1))
+      } else if (each.substring(0, 2) === "::") {
+        this.buffer.push(each.substring(2))
+      } else {
+        this.queueString(each)
       }
 
-      if (char === "\n") {
+    })
+    // this.locked = false
+  }
 
-        if (string.substring(0, 5) === "data:") {
+  execFromBuffer() {
+    if (!this.locked && this.buffer.length > 0) {
+      let command = this.buffer.shift()
+      this._exec(command)
+    }
+  }
 
-          this.screenBuffer.push(string)
+  ascii(first) {
+    if (first) {
+      this.buffer.unshift("ascii")
+    }
+    this.queue("ascii")
+  }
+
+  _getStatus() {
+    let buffer = []
+    let read = setInterval(() => {
+      if (this.output.readableLength > 0) {
+        while (this.output.readableLength > 0) {
+          let line = this._getLine()
+          buffer.push(line)
+
         }
-        string = ''
+        this.status = buffer
+        clearInterval(read)
+        this.locked = false
+        this.emit("unlock")
+        this.emit("NEW_STATUS", this.status)
       }
-      if (this.screenBuffer.length > 22) {
-        this.screen.setScreen(this.screenBuffer)
+    }, 100);
 
-        this.screen = []
+  }
+
+  _getScreen() {
+    let screenBuffer = []
+    let read = setInterval(() => {
+      if (this.output.readableLength > 0) {
+        while (this.output.readableLength > 0) {
+          let line = this._getLine()
+          screenBuffer.push(line)
+
+        }
+        this.screen._setScreen(screenBuffer.slice(0, 24))
+        this.status = screenBuffer.slice(24)
+        clearInterval(read)
+        this.locked = false
+        this.emit("unlock")
+        this.emit("NEW_STATUS", this.status)
+      }
+    }, 100);
+
+
+  }
+
+  _getLine() {
+    let string = '';
+    while (this.output.readableLength > 0) {
+      let char = this.output.read(1);
+      if (char !== "\n" && char !== "\r") {
+        string += char;
+      }
+      if (char === "\n") {
+        return string;
       }
     }
-
+    return string
   }
 }
-let test = new Handler()
-test.exec("ascii")
-console.log(test.screen.screenMatrix)
 
-process.stdin.pipe(test.input)
+
+module.exports = { Handler }
+
+

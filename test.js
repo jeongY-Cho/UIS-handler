@@ -1,10 +1,33 @@
-const { spawn } = require("child_process")
+require("dotenv").config()
+const Handler = require("./handler").Handler
 
-const test = spawn("./x3270/ws3270", ["-xrm", "s3270.unlockDelay: False"])
+const PASS = process.env.PASSWORD
+const USER = process.env.USER
 
-const USER = "chodr@bc.edu"
-const PASS = "East6sea"
+const handler = new Handler()
 
-test.stdout.setEncoding("utf8")
+handler.queueConnect("n:bcvmcms.bc.edu")
 
-let counter = 1
+
+let time = Date.now()
+// handler.on("lock", () => {
+//   let now = Date.now()
+//   console.log(now - time + " buffer locked");
+//   time = now
+// })
+// handler.on("unlock", () => {
+//   let now = Date.now()
+//   console.log(now - time + " buffer unlocked");
+//   time = now
+// })
+handler.screen.on("update", (screen) => {
+  console.log("==================================================================\n" + screen.screenString + "\n======================================================");
+
+})
+handler.queueMacro([USER, "::tab", PASS, "::enter", 7, "::enter", 2, "::enter", "R", "::enter"])
+// handler.exec("ascii")
+setTimeout(() => {
+  console.log("exec");
+
+  handler.exec("ascii")
+}, 500);
