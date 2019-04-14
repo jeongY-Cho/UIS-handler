@@ -1,6 +1,7 @@
 const { spawn } = require("child_process")
 const EventEmitter = require("events")
 const Screen = require("./screen")
+const 
 
 
 class Handler extends EventEmitter {
@@ -157,6 +158,6 @@ class Handler extends EventEmitter {
 }
 
 
-module.exports = { Handler }
+module.exports = Handler
 
 

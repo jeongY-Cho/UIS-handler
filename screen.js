@@ -7,11 +7,11 @@ class Screen extends EventEmitter {
     this.screenMatrix = []
     this.screenString = ''
 
-    this.setScreen = this.setScreen.bind(this)
+    this.setScreen = this._setScreen.bind(this)
     this.clearScreenSnapshot = this.clearScreenSnapshot.bind(this)
   }
 
-  setScreen(arr) {
+  _setScreen(arr) {
     this.screenMatrix = []
     this.screenArr = []
     for (let each of arr) {
@@ -25,7 +25,7 @@ class Screen extends EventEmitter {
 
   }
 
-  clearScreenSnapshot = () => {
+  clearScreenSnapshot() {
     this.screenMatrix = []
     this.screenArr = []
     this.screenString = ''
