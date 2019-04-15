@@ -1,0 +1,556 @@
+{
+  "courseCode": "2020F+CSCI110103",
+  "courseInfo": {
+    "term": "2020F",
+    "title": "Computer Science I (CSCI110103)",
+    "code": "CSCI110103",
+    "alert": "CLOSED",
+    "start": 1555074955,
+    "end": 1555300721,
+    "url": "https:\/\/services.bc.edu\/courseinfosched\/main\/courseinfoschedResults!displayOneCourseMethod.action?courseKey=2020F+CSCI110103&presentTerm=",
+    "corequisites": "",
+    "courseIndex": "8948",
+    "credits": 3,
+    "crossListings": "",
+    "day": [
+      "Tue Thu"
+    ],
+    "department": "Computer Science",
+    "description": "This course is an introduction to the art and science of computer programming and to some of the fundamental concepts of computer science. Students will write programs in the Python programming language. Good program design methodology will be stressed throughout. There will also be a study of some of the basic notions of computer science, including computer systems organization, files and some algorithms of fundamental importance.Please Note: At the start of the registration period, only a limited number of places are made available for the classes of 2019 to 2021. If you are unable to sign up during the initial registration period, you can put your name on the waiting list by visiting the Computer Science department office in St. Mary?s South, 2nd floor.\n \n Satisfies Core requirement for: Mathematics",
+    "faculties": [
+      "BOLOTIN,NAOMI"
+    ],
+    "frequency": "Annually",
+    "level": "Undergrad-Majors",
+    "location": [
+      "FULTON HALL 250"
+    ],
+    "maximumSize": 40,
+    "message": [
+      "Course Closed",
+      "Course Open to Sophomores only",
+      "Satisfies Core requirement for: Mathematics",
+      "Must register for the co-requisite course CSCI1006"
+    ],
+    "prerequisites": "o formal prerequisite, but some experience with computers is helpful. The class consist of a lecture and a discussion group. When you registered for the lecture you are required to register for one of the corresponding discussion groups.",
+    "repeatable": "No",
+    "schoolFull": "Morrissey College of Arts and Sciences",
+    "time": [
+      "12:00 p.m. - 1:15 p.m."
+    ],
+    "faculties_ratings": [
+      {
+        "name": "BOLOTIN,NAOMI",
+        "count": "0",
+        "average": "0"
+      }
+    ]
+  },
+  "alertsList": [
+    {
+      "term": "2019F",
+      "alert": "OPEN",
+      "start": 1534816412,
+      "end": 1534872192
+    },
+    {
+      "term": "2019F",
+      "alert": "CLOSED",
+      "start": 1534872192,
+      "end": 1535206155
+    },
+    {
+      "term": "2019F",
+      "alert": "OPEN",
+      "start": 1535206155,
+      "end": 1535391421
+    },
+    {
+      "term": "2019F",
+      "alert": "CLOSED",
+      "start": 1535391421,
+      "end": 1535478341
+    },
+    {
+      "term": "2019F",
+      "alert": "OPEN",
+      "start": 1535478341,
+      "end": 1535556376
+    },
+    {
+      "term": "2019F",
+      "alert": "CLOSED",
+      "start": 1535556376,
+      "end": 1536157933
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1540178860,
+      "end": 1541683234
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1541683234,
+      "end": 1541708021
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1541708021,
+      "end": 1541772160
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1541772160,
+      "end": 1541794411
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1541794411,
+      "end": 1541802343
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1541802343,
+      "end": 1542022650
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1542022650,
+      "end": 1542031949
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1542031949,
+      "end": 1542038309
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1542038309,
+      "end": 1542039125
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1542039125,
+      "end": 1542042384
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1542042384,
+      "end": 1542118604
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1542118604,
+      "end": 1542121766
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1542121766,
+      "end": 1542141219
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1542141219,
+      "end": 1542209927
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1542209927,
+      "end": 1542211984
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1542211984,
+      "end": 1542212184
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1542212184,
+      "end": 1542212935
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1542212935,
+      "end": 1542213891
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1542213891,
+      "end": 1542215152
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1542215152,
+      "end": 1542220222
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1542220222,
+      "end": 1542221974
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1542221974,
+      "end": 1542224931
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1542224931,
+      "end": 1542230046
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1542230046,
+      "end": 1542292399
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1542292399,
+      "end": 1542292649
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1542292649,
+      "end": 1542306434
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1542306434,
+      "end": 1542306683
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1542306683,
+      "end": 1543196734
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1543196734,
+      "end": 1543238625
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1543238625,
+      "end": 1543243335
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1543243335,
+      "end": 1543243535
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1543243535,
+      "end": 1543246362
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1543246362,
+      "end": 1543247173
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1543247173,
+      "end": 1543248494
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1543248494,
+      "end": 1543250516
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1543250516,
+      "end": 1543258697
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1543258697,
+      "end": 1543259236
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1543259236,
+      "end": 1543259724
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1543259724,
+      "end": 1543259795
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1543259795,
+      "end": 1543260569
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1543260569,
+      "end": 1543260635
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1543260635,
+      "end": 1543323541
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1543323541,
+      "end": 1543324307
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1543324307,
+      "end": 1543336441
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1543336441,
+      "end": 1543336883
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1543336883,
+      "end": 1543351063
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1543351063,
+      "end": 1543351817
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1543351817,
+      "end": 1543359390
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1543359390,
+      "end": 1543359718
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1543359718,
+      "end": 1543432376
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1543432376,
+      "end": 1543433620
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1543433620,
+      "end": 1543616301
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1543616301,
+      "end": 1543948344
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1543948344,
+      "end": 1546878462
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1546878462,
+      "end": 1547475456
+    },
+    {
+      "term": "2019S",
+      "alert": "CLOSED",
+      "start": 1547475456,
+      "end": 1547476172
+    },
+    {
+      "term": "2019S",
+      "alert": "OPEN",
+      "start": 1547476172,
+      "end": 1547479900
+    },
+    {
+      "term": "2020F",
+      "alert": "OPEN",
+      "start": 1552689044,
+      "end": 1554472799
+    },
+    {
+      "term": "2020F",
+      "alert": "CLOSED",
+      "start": 1554472799,
+      "end": 1554486517
+    },
+    {
+      "term": "2020F",
+      "alert": "OPEN",
+      "start": 1554486517,
+      "end": 1554489236
+    },
+    {
+      "term": "2020F",
+      "alert": "CLOSED",
+      "start": 1554489236,
+      "end": 1554721826
+    },
+    {
+      "term": "2020F",
+      "alert": "OPEN",
+      "start": 1554721826,
+      "end": 1554726908
+    },
+    {
+      "term": "2020F",
+      "alert": "CLOSED",
+      "start": 1554726908,
+      "end": 1554736104
+    },
+    {
+      "term": "2020F",
+      "alert": "OPEN",
+      "start": 1554736104,
+      "end": 1554741644
+    },
+    {
+      "term": "2020F",
+      "alert": "CLOSED",
+      "start": 1554741644,
+      "end": 1554808537
+    },
+    {
+      "term": "2020F",
+      "alert": "OPEN",
+      "start": 1554808537,
+      "end": 1554812658
+    },
+    {
+      "term": "2020F",
+      "alert": "CLOSED",
+      "start": 1554812658,
+      "end": 1554822416
+    },
+    {
+      "term": "2020F",
+      "alert": "OPEN",
+      "start": 1554822416,
+      "end": 1554824224
+    },
+    {
+      "term": "2020F",
+      "alert": "CLOSED",
+      "start": 1554824224,
+      "end": 1554897381
+    },
+    {
+      "term": "2020F",
+      "alert": "OPEN",
+      "start": 1554897381,
+      "end": 1554898188
+    },
+    {
+      "term": "2020F",
+      "alert": "CLOSED",
+      "start": 1554898188,
+      "end": 1554981644
+    },
+    {
+      "term": "2020F",
+      "alert": "OPEN",
+      "start": 1554981644,
+      "end": 1554985879
+    },
+    {
+      "term": "2020F",
+      "alert": "CLOSED",
+      "start": 1554985879,
+      "end": 1555001003
+    },
+    {
+      "term": "2020F",
+      "alert": "OPEN",
+      "start": 1555001003,
+      "end": 1555006603
+    },
+    {
+      "term": "2020F",
+      "alert": "CLOSED",
+      "start": 1555006603,
+      "end": 1555010671
+    },
+    {
+      "term": "2020F",
+      "alert": "OPEN",
+      "start": 1555010671,
+      "end": 1555015772
+    },
+    {
+      "term": "2020F",
+      "alert": "CLOSED",
+      "start": 1555015772,
+      "end": 1555067844
+    },
+    {
+      "term": "2020F",
+      "alert": "OPEN",
+      "start": 1555067844,
+      "end": 1555074955
+    }
+  ],
+  "comments": []
+}

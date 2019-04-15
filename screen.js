@@ -4,20 +4,17 @@ class Screen extends EventEmitter {
   constructor() {
     super()
     this.screenArr = []
-    this.screenMatrix = []
     this.screenString = ''
 
     this.setScreen = this._setScreen.bind(this)
-    this.clearScreenSnapshot = this.clearScreenSnapshot.bind(this)
+    this.clearScreen = this.clearScreen.bind(this)
   }
 
   _setScreen(arr) {
-    this.screenMatrix = []
     this.screenArr = []
     for (let each of arr) {
       const subEach = each.substring(5);
 
-      this.screenMatrix.push(subEach.split(""))
       this.screenArr.push(subEach)
     }
     this.screenString = this.screenArr.join("\n")
@@ -25,12 +22,19 @@ class Screen extends EventEmitter {
 
   }
 
-  clearScreenSnapshot() {
-    this.screenMatrix = []
+  clearScreen() {
     this.screenArr = []
     this.screenString = ''
   }
 
+  includes(query) {
+    return this.screenString.includes(query)
+  }
+
+  indexOf(query) {
+    return this.screenString.indexOf(query)
+  }
 }
+
 
 module.exports = Screen

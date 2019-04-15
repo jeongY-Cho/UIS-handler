@@ -1,7 +1,7 @@
 const { spawn } = require("child_process")
 const EventEmitter = require("events")
 const Screen = require("./screen")
-const 
+const Status = require("./status")
 
 
 class Handler extends EventEmitter {
@@ -25,12 +25,13 @@ class Handler extends EventEmitter {
       this.locked = true
     })
 
+    this.status = new Status()
     this.screen = new Screen()
 
     this.buffer = []
 
     setInterval(() => {
-      this.execFromBuffer()
+      this._execFromBuffer()
     }, 5);
 
     if (url) {
@@ -43,52 +44,91 @@ class Handler extends EventEmitter {
   }
 
   _exec(command) {
-    this.locked = true
-    this.emit("lock")
-    this.input.write(command + "\n")
-    if (command === "ascii") {
-      this._getScreen()
+    if (typeof command == "function") {
+
+      let commandArr = command()
+      if (typeof commandArr == "string") {
+        command = commandArr
+      } else {
+
+        commandArr.reverse().forEach((each) => {
+
+          let strEach = String(each)
+
+          if (strEach.substring(0, 3) === ":::") {
+
+            this.buffer.unshift(strEach.substring(1))
+          } else if (strEach.substring(0, 2) === "::") {
+            this.buffer.unshift(strEach.substring(2))
+          } else if (typeof each == "function") {
+            this.buffer.unshift(each)
+          } else {
+            this.buffer.unshift("String " + strEach)
+          }
+
+        })
+      }
     } else {
-      this._getStatus()
-      this.buffer.unshift("ascii")
+      this.locked = true
+      this.emit("lock")
+      this.input.write(command + "\n")
+      if (command === "ascii") {
+        this._getScreen()
+      } else {
+        this._getStatus()
+        this.buffer.unshift("ascii")
+      }
     }
   }
+
 
   queue(command) {
     this.buffer.push(command)
   }
+
   queueEnter() {
     this.buffer.push("enter")
   }
+
   queueString(command) {
     this.buffer.push("String " + command)
   }
+
   queueTab() {
     this.buffer.push("tab")
   }
+
   queueConnect(url) {
     this.buffer.push("connect  " + url)
   }
 
   queueMacro(commandArray) {
-    // this.locked = true
-    commandArray.slice().forEach((each) => {
-      each = String(each)
+    if (typeof commandArray === "function") {
+      // if macro is a function add it to buffer
+      this.buffer.push(commandArray)
 
-      if (each.substring(0, 3) === ":::") {
+    } else {
+      // if macro is an array add elements to buffer
+      commandArray.slice().forEach((each) => {
+        let strEach = String(each)
 
-        this.buffer.push(each.substring(1))
-      } else if (each.substring(0, 2) === "::") {
-        this.buffer.push(each.substring(2))
-      } else {
-        this.queueString(each)
-      }
+        if (strEach.substring(0, 3) === ":::") {
+          this.queueString(strEach.substring(1))
+        } else if (strEach.substring(0, 2) === "::") {
+          this.queue(strEach.substring(2))
+        } else if (typeof each == "function") {
+          this.queue(each)
+        } else {
+          this.queueString(strEach)
+        }
 
-    })
-    // this.locked = false
+      })
+
+    }
+
   }
 
-  execFromBuffer() {
+  _execFromBuffer() {
     if (!this.locked && this.buffer.length > 0) {
       let command = this.buffer.shift()
       this._exec(command)
@@ -116,6 +156,10 @@ class Handler extends EventEmitter {
         this.locked = false
         this.emit("unlock")
         this.emit("NEW_STATUS", this.status)
+        if (this.buffer.length == 0) {
+          this.emit("empty")
+        }
+
       }
     }, 100);
 
@@ -136,6 +180,10 @@ class Handler extends EventEmitter {
         this.locked = false
         this.emit("unlock")
         this.emit("NEW_STATUS", this.status)
+        if (this.buffer.length == 0) {
+          this.emit("empty")
+        }
+
       }
     }, 100);
 

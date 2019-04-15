@@ -1,10 +1,10 @@
 require("dotenv").config()
-const Handler = require("./handler")
+const UisHandler = require("./uisHandler")
 
 const PASS = process.env.PASSWORD
 const USER = process.env.USER
 
-const handler = new Handler("n:bcvmcms.bc.edu")
+const UIS = new UisHandler()
 
 // handler.queueConnect("n:bcvmcms.bc.edu")
 
@@ -20,14 +20,27 @@ let time = Date.now()
 //   console.log(now - time + " buffer unlocked");
 //   time = now
 // })
-handler.screen.on("update", (screen) => {
-  console.log("==================================================================\n" + screen.screenString + "\n=====================================================\n" + handler.status);
+// UIS.screen.on("update", (screen) => {
+//   console.log("==================================================================\n" + screen.screenString + "\n=====================================================");
+// })
 
-})
-handler.queueMacro([USER, "::tab", PASS, "::enter", 7, "::enter", 2, "::enter", "R", "::enter"])
-// handler.exec("ascii")
-setTimeout(() => {
-  console.log("exec");
+async function main() {
+  try {
+    await UIS.login(USER, PASS)
+    await UIS.getToRegistration()
 
-  handler.exec("ascii")
-}, 500);
+    console.log(UIS.readCourses())
+    await UIS.clearAll()
+    let things = await UIS.registerAll([{ index: 1254 }])
+    console.log("things ", things);
+
+    await UIS.cancelChanges()
+    // console.log(UIS.readCourses())
+  } catch (err) {
+    console.log(UIS.location)
+    console.log(err);
+
+  }
+}
+
+main()
