@@ -30,9 +30,11 @@ class Handler extends EventEmitter {
 
     this.buffer = []
 
-    setInterval(() => {
+    this.execLoop = setInterval(() => {
       this._execFromBuffer()
     }, 5);
+
+    this.disconnect = this.disconnect.bind(this)
 
     if (url) {
       this.queueConnect(url)
@@ -202,6 +204,13 @@ class Handler extends EventEmitter {
       }
     }
     return string
+  }
+
+  disconnect() {
+    this.removeAllListeners()
+    this.screen.removeAllListeners()
+    clearInterval(this.execLoop)
+    this.input.write("quit\n")
   }
 }
 

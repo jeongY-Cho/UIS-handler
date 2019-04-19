@@ -7,6 +7,12 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "test handler",
+      "program": "${workspaceFolder}/test2.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Launch Program",
       "program": "${workspaceFolder}\\test.js"
     }

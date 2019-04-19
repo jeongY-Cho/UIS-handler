@@ -1,4 +1,4 @@
-const Handler = require("./handler")
+const Handler = require("./handler/handler")
 
 class UisHandler extends Handler {
   constructor() {
@@ -11,6 +11,7 @@ class UisHandler extends Handler {
     this.readCourses = this.readCourses.bind(this)
     this.clearRegistration = this.clearRegistration.bind(this)
     this.cancelChanges = this.cancelChanges.bind(this)
+    // this.disconnect = this.disconnect.bind(this)
   }
 
   getLocation() {
@@ -58,21 +59,40 @@ class UisHandler extends Handler {
         this.queueMacro(["R", "::enter"])
       }
 
-      this.on("empty", () => {
-        resolve()
-      })
-    })
-
-  }
-
-  login(username, password) {
-    return new Promise((resolve, reject) => {
-      this.queueMacro([username, "::tab", password, "::enter"])
       this.once("empty", () => {
         resolve()
       })
     })
+
   }
+
+  login(username, password, accessCode) {
+    return new Promise((resolve, reject) => {
+
+      this.queueMacro([username, "::tab", password, "::enter"])
+      this.once("empty", async () => {
+        await this.getToRegistration()
+        let loc = this.getLocation()
+        if (loc == "accessCode") {
+          this.queueMacro([accessCode, "::enter"])
+          this.once("empty", () => {
+            loc = this.getLocation()
+            if (loc != "registration") {
+              reject(new Error("not in registration"))
+            } else if (loc == "accessCode") {
+              reject(new Error("invalid Access Code"))
+            } else {
+              resolve()
+            }
+
+          })
+        } else if (loc == "registration") {
+          resolve()
+        }
+      })
+    })
+  }
+
 
   readCourses() {
     if (this.getLocation() !== "registration") { throw new Error("not on registration page") }
@@ -80,35 +100,36 @@ class UisHandler extends Handler {
 
     return this.screen.screenArr.slice(10, 22)    // get slice of courses
       .map((each) => {
-        let index = each.slice(4, 8)
-        let course = ''
+        let courseIndex = each.slice(4, 8)
+        let code = ''
         let error = ''
-        if (index !== "____") {
-          course = each.slice(15, 25)
+        if (courseIndex !== "____") {
+          code = each.slice(15, 25)
         }
         if (each[63] === "<") {
           error = each.slice(64)
         }
-        return { index, course, error }                 // reduce slice to just the index numbers
+        return { courseIndex, code, error }                 // reduce slice to just the index numbers
       })
 
   }
 
-  registerOneByIndex(index) {
+  registerOneByIndex(courseIndex) {
     return new Promise((resolve, reject) => {
       if (this.getLocation() !== "registration") { throw new Error("not on registration page") }
       // find first open slot
       let courses = this.readCourses()
+
       let i
       for (i = 0; i < courses.length; i++) {
-        if (courses[i].index === "____") {
+        if (courses[i].courseIndex === "____") {
           break
         }
       }
       // enter index
       this.queue("home")
       this.queueMacro(Array(i).fill("::tab"))
-      this.queueMacro([index, "::enter"])
+      this.queueMacro([courseIndex, "::enter"])
       // check for errors
       this.once("empty", async () => {
 
@@ -120,7 +141,7 @@ class UisHandler extends Handler {
           await this.clearRegistration(i)
           reject(new Error(course.error))
         } else {
-          reject
+          resolve()
         }
 
       })
@@ -132,50 +153,77 @@ class UisHandler extends Handler {
     return new Promise(async (resolve, reject) => {
       let coursesRegistered = []
       let coursesFailed = []
-      let coreqs = []
+      let coreqs = {}
       for (let each of courseArr) {
         try {
-          await this.registerOneByIndex(each.index)
+          await this.registerOneByIndex(each.courseIndex)
+          console.log("registered: ", each.courseIndex);
 
           coursesRegistered.push(each)
         } catch (err) {
-          if (err.message = "COREQ REQUIRED   ") {
-            this.registerOneByIndex(each.coreq)
+          if (err.message == "COREQ REQUIRED   ") {
+            coreqs[each.courseIndex] = { course: each, reason: err.message }
+          } else {
+            coursesFailed.push({ course: each, reason: err.message })
           }
-          coursesFailed.push({ course: each, reason: err.message })
         }
       }
 
+      // resolve coreqs. check that all coreqs have been registered
+      let courses = this.readCourses()
+
+      for (let course of courses) {
+        if (Object.keys(coreqs).includes(course.courseIndex) && course.error == '') {
+          coursesRegistered.push(coreqs[course.courseIndex].course)
+          delete coreqs[course.courseIndex]
+
+        }
+      }
+      for (let coreq of Object.values(coreqs)) {
+        coursesFailed.push({ course: coreq.course, reason: coreq.reason })
+      }
+
       resolve({ coursesRegistered, coursesFailed })
+
     })
+
   }
 
+  /*
+  clearRegistration accepts either a position or course index number
+  and clears that line from the registration screen.
+  input type is determined by size: 
+    if its less than or equal to 12, input is interpreted as a positional value
+    if its greater than 12, input is interpreted as a course index 
+  */
   clearRegistration(input) {
+    // input is either position or index number
     return new Promise((resolve, reject) => {
-      this.queue("home")
+      if (this.getLocation() !== "registration") { reject(new Error("not in registration")) }  // check position
+      this.queue("home")                            // place on home field
 
       if (input <= 12) {
         // if position (ie. a number at max length 12) clear line of the position
         this.queueMacro(Array(input).fill("::tab"))
       } else if (input > 100) {
-        let courses = this.readCourses()
-        var i
+        // if import is a large number find then clear that index 
+        let courses = this.readCourses()            // get current courses
+        var i                                       // index var
+        // loop to locate index
         for (i = 0; i < courses.length; i++) {
-
           if (courses[i].index == input) {
-            break
+            break                                   // break if input equals the position index
           }
         }
-        this.queueMacro(Array(i).fill("::tab"))
+        this.queueMacro(Array(i).fill("::tab"))     // move to position
       }
-      this.queueMacro(Array(4).fill("::delete"))
-      this.queue("enter")
+      this.queueMacro(Array(4).fill("::delete"))    // clear that field
+      this.queue("enter")                           // stage change
 
-      this.on("empty", () => {
-        resolve()
+      this.once("empty", () => {
+        resolve()                                   // resolve promise once queue clears
       })
     })
-    // input is either position or index number
 
   }
 
@@ -199,6 +247,35 @@ class UisHandler extends Handler {
       })
     })
   }
+
+  saveChanges() {
+    return new Promise((resolve, reject) => {
+      this.queueMacro(["::home", "save", "::enter"])
+      this.once("empty", () => {
+        resolve()
+      })
+    })
+  }
+
+  logout() {
+    return new Promise((resolve, reject) => {
+      this.queueMacro(["done", "::enter", "::enter", "L", "::enter"])
+      this.once("empty", () => {
+        resolve()
+      })
+
+    })
+  }
+
+  // disconnect() {
+  //   return new Promise((resolve, reject) => {
+  //     this.once("empty", () => {
+  //       resolve()
+  //     })
+
+  //     this.queueMacro(["::disconnect", "::quit"])
+  //   })
+  // }
 }
 
 module.exports = UisHandler
