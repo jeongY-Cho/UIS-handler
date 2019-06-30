@@ -30,6 +30,8 @@ class UisHandler extends Handler {
       newLoc = "registration"
     } else if (this.screen.includes("ACCESS CODE")) {
       newLoc = "accessCode"
+    } else if (this.screen.includes("New password:") || this.screen.includes("NEW PASSWORD:")) {
+      newLoc = "uisClosed"
     } else {
       newLoc = "unknown"
       // throw new Error(`Unknown Location\nSnapshot:\n=============================================\n${this.screen.screenString}\n=============================================`)
@@ -57,39 +59,49 @@ class UisHandler extends Handler {
         this.queueMacro([2, "::enter", "R", "::enter"])
       } else if (location == "uview") {
         this.queueMacro(["R", "::enter"])
+      } else {
+        reject(new Error("Unknown Location"))
       }
 
       this.once("empty", () => {
-        resolve()
+        resolve(this.getLocation())
       })
     })
 
   }
 
-  login(username, password, accessCode) {
+  login(username, password) {
     return new Promise((resolve, reject) => {
 
-      this.queueMacro([username, "::tab", password, "::enter"])
-      this.once("empty", async () => {
-        await this.getToRegistration()
-        let loc = this.getLocation()
-        if (loc == "accessCode") {
-          this.queueMacro([accessCode, "::enter"])
-          this.once("empty", () => {
-            loc = this.getLocation()
-            if (loc != "registration") {
-              reject(new Error("not in registration"))
-            } else if (loc == "accessCode") {
-              reject(new Error("invalid Access Code"))
-            } else {
-              resolve()
-            }
+      this.queueMacro(["::home", username, "::tab", password, "::enter"])
+      this.once("empty", () => {
 
-          })
-        } else if (loc == "registration") {
+        let loc = this.getLocation()
+        console.log(loc);
+        if (loc == "login") {
+          reject(new Error("Incorrect Username/Password"))
+        } else if (loc === "uisClosed") {
+          reject(new Error("UIS Closed"))
+        } else {
           resolve()
         }
       })
+    })
+  }
+
+  enterAccessCode(accessCode) {
+    return new Promise((resolve, reject) => {
+
+      this.once("empty", () => {
+        let loc = this.getLocation()
+        if (loc === "registration") {
+          console.log("uisHandler.js");
+          resolve()
+        } else {
+          reject(new Error("Wrong Access Code"))
+        }
+      })
+      this.queueMacro(["::home", "::DeleteField", accessCode, "::enter"])
     })
   }
 
@@ -136,9 +148,12 @@ class UisHandler extends Handler {
         let course = this.readCourses()[i]
 
         if (course.error === "COREQ REQUIRED   ") {
+          this.emit("registrationSuccess", courseIndex)
           reject(new Error(course.error))
         } else if (course.error) {
           await this.clearRegistration(i)
+          this.emit("registrationFailure", courseIndex)
+
           reject(new Error(course.error))
         } else {
           resolve()
@@ -151,6 +166,10 @@ class UisHandler extends Handler {
 
   registerAll(courseArr) {
     return new Promise(async (resolve, reject) => {
+      this.once("cancel", () => {
+        courseArr = []
+        reject()
+      })
       let coursesRegistered = []
       let coursesFailed = []
       let coreqs = {}
@@ -189,6 +208,9 @@ class UisHandler extends Handler {
 
   }
 
+  cancel() {
+    this.emit("cancel")
+  }
   /*
   clearRegistration accepts either a position or course index number
   and clears that line from the registration screen.
@@ -217,7 +239,7 @@ class UisHandler extends Handler {
         }
         this.queueMacro(Array(i).fill("::tab"))     // move to position
       }
-      this.queueMacro(Array(4).fill("::delete"))    // clear that field
+      this.queue("DeleteField")    // clear that field
       this.queue("enter")                           // stage change
 
       this.once("empty", () => {
@@ -229,7 +251,6 @@ class UisHandler extends Handler {
 
   cancelChanges() {
     return new Promise((resolve) => {
-      this.queue("home")
       this.queueString("back")
       this.queueEnter()
       this.once("empty", () => {
@@ -250,7 +271,7 @@ class UisHandler extends Handler {
 
   saveChanges() {
     return new Promise((resolve, reject) => {
-      this.queueMacro(["::home", "save", "::enter"])
+      this.queueMacro(["save", "::enter"])
       this.once("empty", () => {
         resolve()
       })
@@ -266,6 +287,7 @@ class UisHandler extends Handler {
 
     })
   }
+
 
   // disconnect() {
   //   return new Promise((resolve, reject) => {

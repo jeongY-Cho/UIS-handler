@@ -1,4 +1,7 @@
 const EventEmitter = require("events")
+const fs = require("fs")
+
+const logFile = fs.createWriteStream("./log.log")
 
 class Screen extends EventEmitter {
   constructor() {
@@ -8,6 +11,7 @@ class Screen extends EventEmitter {
 
     this.setScreen = this._setScreen.bind(this)
     this.clearScreen = this.clearScreen.bind(this)
+
   }
 
   _setScreen(arr) {
@@ -18,6 +22,9 @@ class Screen extends EventEmitter {
       this.screenArr.push(subEach)
     }
     this.screenString = this.screenArr.join("\n")
+    console.log(this.screenArr);
+    logFile.write(new Date(Date.now()).toISOString() + "\n" + this.status + "\n" + "-----------------------------------------------------------" + "\n" + this.screenString + "\n" + "----------------------------------------------------" + "\n\n")
+
     this.emit("update", this)
 
   }

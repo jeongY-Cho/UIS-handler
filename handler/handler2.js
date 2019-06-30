@@ -5,8 +5,6 @@ const EventEmitter = require("events")
 const Screen = require("./screen")
 const Status = require("./status")
 // eslint-disable-next-line no-unused-vars
-const fs = require("fs")
-
 
 class Handler extends EventEmitter {
   constructor(url) {
@@ -26,8 +24,6 @@ class Handler extends EventEmitter {
     })
     // set for stdout so its easier
     this.output.setEncoding("utf-8")
-
-
 
     this.status = []
     this.screen = new Screen()
@@ -189,9 +185,11 @@ class Handler extends EventEmitter {
           screenBuffer.push(line)
 
         }
+        this.screen.status = screenBuffer.slice(24)
         this.screen.setScreen(screenBuffer.slice(0, 24))
         this.status = screenBuffer.slice(24)
         clearInterval(read)
+
         this.locked = false
         this.emit("unlock")
         this.emit("NEW_STATUS", this.status)
