@@ -25,23 +25,20 @@ var Handler = /** @class */ (function (_super) {
         var _this = _super.call(this) || this;
         //
         _this.buffer = [];
-        _this.execLoop = setInterval(function () {
-            _this._execFromBuffer();
-        }, 10);
         _this.screen = new screen_1.default();
         _this.status = [];
         //
         _this.locked = false;
-        _this._execFromBuffer = function () {
-            _this._exec(_this.buffer.shift());
-        };
         _this._exec = function (command) {
             _this.lock = true;
             if (typeof command === "string") {
+                _this.output.once("readable", function () {
+                    setTimeout(function () {
+                        _this.getScreen();
+                    }, 100);
+                });
                 if (command.substring(0, 3) === ":::") {
                     _this.input.write(command.substring(1) + "\n");
-                    _this.input.write("ascii\n");
-                    _this.getScreen();
                 }
                 else if (command.substring(0, 2) === "::") {
                     _this.input.write("String " + command.substring(2) + "\n");
@@ -49,14 +46,18 @@ var Handler = /** @class */ (function (_super) {
                 else {
                     _this.input.write(command + "\n");
                 }
+                if (command !== "ascii") {
+                    _this.buffer.unshift("ascii");
+                }
             }
             else if (typeof command === "function") {
                 var macroReturn = command();
-                if (typeof macroReturn === "string") {
-                    _this.buffer.unshift("");
-                }
+                _this.buffer.unshift(macroReturn);
+                _this.lock = false;
             }
             else if (command instanceof Array) {
+                _this.buffer = command.concat(_this.buffer);
+                _this.lock = false;
             }
             else {
                 throw new Error("invalid commanad");
@@ -68,8 +69,13 @@ var Handler = /** @class */ (function (_super) {
                 var line = _this.getLine();
                 screenBuffer.push(line);
             }
-            _this.screen.set(screenBuffer.slice(0, 24));
-            _this.status = screenBuffer.slice(24);
+            if (screenBuffer.length === 2) {
+                _this.status = screenBuffer;
+            }
+            else {
+                _this.screen.set(screenBuffer.slice(0, 24).map(function (line) { return line.substring(5); }));
+                _this.status = screenBuffer.slice(24);
+            }
             _this.lock = false;
         };
         _this.getLine = function () {
@@ -104,15 +110,23 @@ var Handler = /** @class */ (function (_super) {
             if (_this.buffer.length) {
                 _this._exec(_this.buffer.shift());
             }
+            else {
+                _this.emit("empty");
+            }
         });
         _this.on("newCommand", function (command) {
-            _this.buffer.push(command);
-            if (!_this.lock) {
-                _this._exec(_this.buffer.shift());
+            if (command) {
+                _this.buffer.push(command);
+                if (!_this.lock) {
+                    _this._exec(_this.buffer.shift());
+                }
             }
         });
         return _this;
     }
+    Handler.prototype.connect = function (url) {
+        this.queue("connect " + url);
+    };
     Object.defineProperty(Handler.prototype, "lock", {
         get: function () {
             return this.locked;
@@ -129,5 +143,12 @@ var Handler = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Handler.prototype.pause = function () {
+        this.lock = true;
+    };
+    Handler.prototype.continue = function () {
+        this.lock = false;
+    };
     return Handler;
 }(events_1.default));
+exports.default = Handler;

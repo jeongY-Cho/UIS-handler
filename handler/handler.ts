@@ -3,14 +3,14 @@ import EventEmitter from "events";
 import { Writable, Readable } from "stream";
 import Screen from "./screen";
 
-type MacroArray = Array<string | MacroResolver>;
+type MacroArray = Array<string | MacroResolver | any[]>;
 type MacroResolver =
   | (() => MacroArray)
   | (() => MacroResolver)
   | (() => string);
 type Command = string | MacroResolver | MacroArray;
 
-class Handler extends EventEmitter {
+export default class Handler extends EventEmitter {
   // emulator is the child process instantiated in constructor of x3270
   emulator: ChildProcessWithoutNullStreams;
 
@@ -18,9 +18,6 @@ class Handler extends EventEmitter {
   buffer: Command[] = [];
   input: Writable;
   output: Readable;
-  execLoop: NodeJS.Timeout = setInterval(() => {
-    this._execFromBuffer();
-  }, 10);
 
   screen = new Screen();
   status: string[] = [];
@@ -28,7 +25,7 @@ class Handler extends EventEmitter {
   //
   private locked = false;
 
-  constructor(url: string) {
+  constructor(url?: string) {
     super();
 
     if (process.platform === "win32") {
@@ -46,42 +43,57 @@ class Handler extends EventEmitter {
     this.output.setEncoding("utf-8");
 
     this.on("unlock", () => {
+
       if (this.buffer.length) {
         this._exec(this.buffer.shift()!);
+      } else {
+
+        this.emit("empty")
       }
     });
 
     this.on("newCommand", (command: Command) => {
-      this.buffer.push(command);
-      if (!this.lock) {
-        this._exec(this.buffer.shift()!);
+      if (command) {
+        this.buffer.push(command)
+        if (!this.lock) {
+          this._exec(this.buffer.shift()!);
+        }
       }
     });
   }
 
-  _execFromBuffer = (): void => {
-    this._exec(this.buffer.shift()!);
-  };
+  connect(url: string): void {
+    this.queue("connect " + url)
+  }
 
   private _exec = (command: Command): void => {
+
     this.lock = true;
 
     if (typeof command === "string") {
+      this.output.once("readable", () => {
+        setTimeout(() => {
+          this.getScreen()
+        }, 100);
+      })
       if (command.substring(0, 3) === ":::") {
         this.input.write(command.substring(1) + "\n");
-        this.input.write("ascii\n");
-        this.getScreen();
       } else if (command.substring(0, 2) === "::") {
         this.input.write("String " + command.substring(2) + "\n");
       } else {
         this.input.write(command + "\n");
       }
+      if (command !== "ascii") {
+        this.buffer.unshift("ascii")
+      }
+
     } else if (typeof command === "function") {
       let macroReturn = command();
-      if (typeof macroReturn === "string") {
-        this.buffer.unshift("");
-      }
+      this.buffer.unshift(macroReturn)
+      this.lock = false
     } else if (command instanceof Array) {
+      this.buffer = command.concat(this.buffer)
+      this.lock = false
     } else {
       throw new Error("invalid commanad");
     }
@@ -93,8 +105,13 @@ class Handler extends EventEmitter {
       let line = this.getLine();
       screenBuffer.push(line);
     }
-    this.screen.set(screenBuffer.slice(0, 24));
-    this.status = screenBuffer.slice(24);
+
+    if (screenBuffer.length === 2) {
+      this.status = screenBuffer
+    } else {
+      this.screen.set(screenBuffer.slice(0, 24).map(line => line.substring(5)));
+      this.status = screenBuffer.slice(24);
+    }
     this.lock = false;
   };
 
@@ -106,9 +123,11 @@ class Handler extends EventEmitter {
         string += char;
       }
       if (char === "\n") {
+
         return string;
       }
     }
+
     return string;
   };
 
@@ -126,5 +145,12 @@ class Handler extends EventEmitter {
     } else {
       this.emit("unlock");
     }
+  }
+
+  pause() {
+    this.lock = true
+  }
+  continue() {
+    this.lock = false
   }
 }
